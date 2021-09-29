@@ -1,0 +1,28 @@
+
+gt.mpt <- function(p, N, psz, Se, Sp){
+  Ymul <- rmultinom(N,1,p)
+  Ytil1 <- Ymul[2, ] + Ymul[4, ]
+  Ytil2 <- Ymul[3, ] + Ymul[4, ]
+
+  M <- floor(N/psz)
+  Rem <- N-M*psz
+  if(Rem > 0){
+    cvec <- c( rep(psz, M), Rem )
+  }else{
+    cvec <- c( rep(psz, M))  
+  }
+  M <- length(cvec)
+  id <- cumsum(c(0,cvec))
+
+  Z1 <- Z2 <- rep( -9, M )
+  for(m in 1:M){
+    mid <- (id[m]+1):id[m+1]
+    prob1 <- ifelse(sum(Ytil1[mid])>0,Se[1],1-Sp[1])
+    prob2 <- ifelse(sum(Ytil2[mid])>0,Se[2],1-Sp[2])
+    Z1[m] <- rbinom(1,1,prob1)
+    Z2[m] <- rbinom(1,1,prob2)
+  }
+  Zmul <- cbind( (1-Z1)*(1-Z2), Z1*(1-Z2), (1-Z1)*Z2, Z1*Z2 )
+  return( list( "Z1"=Z1, "Z2"=Z2, "Zmul"=Zmul ) )
+}
+
