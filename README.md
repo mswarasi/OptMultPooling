@@ -50,7 +50,7 @@ Sp <- c(.95, .99)  # Specificities for diseases 1 & 2
 p <- c(0.85, 0.07, 0.05, 0.03)  # True parameter
 
 
-### Simulation and estimation based on the work in Li et al. (2017):
+## Simulation and estimation based on the work in Li et al. (2017):
 
 set.seed(123)
 
@@ -62,7 +62,8 @@ res1 <- mult.mle.mpt(multData=M,psz=psz,Se=Se,Sp=Sp,covariance=TRUE)
 
 print( res1 )
 
-# Estimation results:
+
+### Estimation results:
 
 $param
 
@@ -90,4 +91,51 @@ $summary
 Estimate 0.09545371 0.069121716
 
 Std.Err  0.01152220 0.008848296
+
+
+
+## Simulation and estimation based on the work in Tebbs et al. (2013):
+
+set.seed(123)
+
+h2d <- hier.alg.data(p=p,N=N,c.s=c(psz,1),Se=Se,Sp=Sp)
+
+h2d.Yt <- h2d$Ytmat
+
+h2d.Yt[ ,c(1,2)] <- 0
+
+param0 <- rep(.25, 4)  # Initial value of the param
+
+res2 <- mult.mle.dt(p0=param0,Ytmat=h2d.Yt,Zmat=h2d$Zmat,G=3000,a=1000,tol=10^(-3),covariance=TRUE )
+                         
+print( res2 )
+
+
+### Estimation results:
+
+$param
+
+[1] 0.8487080 0.0792350 0.0563485 0.0157085
+
+$covariance
+
+               [,1]          [,2]          [,3]
+               
+[1,]  1.286700e-04 -6.753280e-05 -4.784769e-05
+
+[2,] -6.753280e-05  7.326994e-05 -4.490042e-06
+
+[3,] -4.784769e-05 -4.490042e-06  5.322131e-05
+
+$std.err
+
+[1] 0.011343281 0.008559786 0.007295294 0.003926857
+
+$summary
+
+           Disease.1   Disease.2
+           
+Estimate 0.094943500 0.072057000
+
+Std.Err  0.009284178 0.008177674
 
