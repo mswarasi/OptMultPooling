@@ -1,9 +1,9 @@
-This repository contains R programs of the working paper, "Optimizing pooled testing for determining prevalence and/or identifying infected." Our goal is to examine the optimal pooling strategies with multiple (correlated) infections. Particularly, we intend to determine the pool sizes that (a) maximizes the estimation efficiency (prevision), (b) reduces the number of tests expendend, and (c) identifying the cost-effective settings by which one can make a compromise between the best estimation and best screening. 
+This repository contains R programs of the working paper, "Optimizing pooled testing for determining prevalence and/or identifying infected." Our goal is to examine the optimal pooling strategies with multiple (correlated) infections. Particularly, we intend to determine the pool size that (a) maximizes the estimation efficiency (prevision), (b) maximizes the testing efficiency, or (c) offers the cost-effective estimation as a compromise between optimal estimation and optimal testing. 
 
-Our approach involves calculating the maximum likelihood estimates of the multinomial disease prevalence parameter p=(p00, p10, p01, p11), which we accomplish based on the methods in Tebbs et al. (2013) and Li et al. (2017).
+Our approach involves calculating the maximum likelihood estimates of the multinomial disease prevalence parameter p=(p00, p10, p01, p11) based on the methods in Tebbs et al. (2013) and Li et al. (2017).
 
 
-Files uploaded:
+Files uploaded are:
 
 1). multMLE.MPT.txt -- Main R funciton that calculates the maximum likelihood estimates from initial pooled responses (Li et al., 2017).
 
