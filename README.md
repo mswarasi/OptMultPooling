@@ -2,7 +2,8 @@ This repository contains R programs of the working paper, "Optimizing pooled tes
 
 Our approach involves calculating the maximum likelihood estimates of the multinomial disease prevalence parameter p=(p00, p10, p01, p11), which we accomplish based on the methods in Tebbs et al. (2013) and Li et al. (2017).
 
-Files that we have uploaded:
+
+Files uploaded:
 
 1). multMLE.MPT.txt -- Main R funciton that calculates the maximum likelihood estimates from initial pooled responses (Li et al., 2017).
 
@@ -17,7 +18,8 @@ Files that we have uploaded:
 6). gbbstwodisgen.dll -- Used in multMLE.DT.txt
 
 
+
 References
 1. Hungerford, L., Warasi, M., and Lahmers, K. (2021+). Optimizing pooled testing for determining prevalence and/or identifying infected. In preparation.
-2. Tebbs, J., McMahan, C., and Bilder, C. (2013). Two-stage hierarchical group testing for multiple infections with application to the Infertility Prevention Project. _Biometrics_ **69**, 1064--1073.
+2. Tebbs, J., McMahan, C., and Bilder, C. (2013). Two-stage hierarchical group testing for multiple infections with application to the Infertility Prevention Project. _Biometrics_, **69**, 1064-1073.
 
