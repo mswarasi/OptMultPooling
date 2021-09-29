@@ -29,8 +29,22 @@ References
 
 
 
+## Usage
+
+mult.mle.mpt(multData,psz,Se,Sp,covariance=FALSE)
+
+mult.mle.dt(p0=rep(.25,4),Ytmat,Zmat,G=500,a=100,tol=10^(-3),covariance=FALSE)
+
+
+## Download and save the files in a computer folder and specify the directory:
+setwd(dir = "C:\\programs")
+
+## Import the files
+source( "multMLE.MPT.txt" )
+source( "multMLE.DT.txt" )
+source( "InitialPooledTesting.txt" )
+source( "TwoStageHierPooling.txt" )
+
+
 ###################### SIMULATION EXAMPLES ######################
-
-## Usage (master pooled testing and two-stage hierarchical testing)
-
 
