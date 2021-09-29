@@ -1,0 +1,159 @@
+
+#**************************************************#
+# Description
+# -----------
+# Main function to calculate the maximum likelihood 
+# estimate of the multinomial disease prevalence  
+# parameter: p=(p00,p10,p01,p11) only from the    
+# initial pooled responses. The estimation is 
+# performed based on the method in Li et al. (2017).
+#
+#
+# Usage
+# -----
+# mult.mle.mpt(multData,psz,Se,Sp,covariance=FALSE)
+#
+#
+# Arguments
+# ---------
+# multData   : A vector of multinomial counts data.
+# psz        : Pool size used (constant).
+# Se         : A vector of sensitivities; Se=c(Se1,Se2).
+# Sp         : A vector of specificities; Sp=c(Sp1,Sp2).
+# covariance : If TRUE, the covariance matrix will be reported.
+#
+#
+# Details
+# -------
+# The total number of individuals tested is N (sample size).
+# Because psz is the pool size, the total number of pools 
+# tested are m = N/psz. 
+# 
+# Note: No retesting is performed.
+# 
+#
+# Value
+# -----
+# A list of estimates with components:
+#
+# param      : Maximum likelihood estimate of p=(p00,p10,p01,p11) 
+# covariance : Estimated covariance matrix
+# std.err    : Standard error of the estimates
+# summary    : Summary of the marginal disease prevalence
+#
+#
+mult.mle.mpt <- function(multData,psz,Se,Sp,covariance=FALSE){
+  tosscoin <- function(times){
+    temp <- list()
+    for (i in 1:times){
+        temp[[i]] <- c(0,1)
+    }
+    res <- expand.grid(temp, KEEP.OUT.ATTRS = FALSE)
+    return(as.matrix(res))
+  }
+  Pii <- function(a,b,c,d,Se,Sp){
+    U <- V <- rep(-9, 4)
+    U[1] <- Se[1]^(a*c)
+    U[2] <- (1-Se[1])^(a*(1-c))
+    U[3] <- Sp[1]^( (1-a)*(1-c) )
+    U[4] <- (1-Sp[1])^( (1-a)*c )
+    V[1] <- Se[2]^(b*d)
+    V[2] <- (1-Se[2])^(b*(1-d))
+    V[3] <- Sp[2]^( (1-b)*(1-d) )
+    V[4] <- (1-Sp[2])^( (1-b)*d )
+    prod(U)*prod(V)
+  }
+  k <- psz
+  M <- multData
+  m <- sum(M)
+  mab <- function(a, b){
+    M[1]^( (1-a)*(1-b) )*M[2]^( a*(1-b) )*M[3]^( (1-a)*b )*M[4]^( a*b )
+  }
+  ghat <- function(a, b){
+    min( Pii(a,b,a,b,Se,Sp), max( Pii(1-a,1-b,a,b,Se,Sp), mab(a,b)/m ) )
+  }
+  matD <- rbind(
+    c( Pii(0,0,0,0,Se,Sp)-Pii(1,1,0,0,Se,Sp), Pii(1,0,0,0,Se,Sp)-Pii(1,1,0,0,Se,Sp), Pii(0,1,0,0,Se,Sp)-Pii(1,1,0,0,Se,Sp) ),
+    c( Pii(0,0,1,0,Se,Sp)-Pii(1,1,1,0,Se,Sp), Pii(1,0,1,0,Se,Sp)-Pii(1,1,1,0,Se,Sp), Pii(0,1,1,0,Se,Sp)-Pii(1,1,1,0,Se,Sp) ),
+    c( Pii(0,0,0,1,Se,Sp)-Pii(1,1,0,1,Se,Sp), Pii(1,0,0,1,Se,Sp)-Pii(1,1,0,1,Se,Sp), Pii(0,1,0,1,Se,Sp)-Pii(1,1,0,1,Se,Sp) )
+  )
+  matA <- rbind(
+    c( ghat(0,0)-Pii(1,1,0,0,Se,Sp), Pii(1,0,0,0,Se,Sp)-Pii(1,1,0,0,Se,Sp), Pii(0,1,0,0,Se,Sp)-Pii(1,1,0,0,Se,Sp) ),
+    c( ghat(1,0)-Pii(1,1,1,0,Se,Sp), Pii(1,0,1,0,Se,Sp)-Pii(1,1,1,0,Se,Sp), Pii(0,1,1,0,Se,Sp)-Pii(1,1,1,0,Se,Sp) ),
+    c( ghat(0,1)-Pii(1,1,0,1,Se,Sp), Pii(1,0,0,1,Se,Sp)-Pii(1,1,0,1,Se,Sp), Pii(0,1,0,1,Se,Sp)-Pii(1,1,0,1,Se,Sp) )
+  )
+  matB <- rbind(
+    c( Pii(0,0,0,0,Se,Sp)-Pii(1,1,0,0,Se,Sp), ghat(0,0)-Pii(1,1,0,0,Se,Sp), Pii(0,1,0,0,Se,Sp)-Pii(1,1,0,0,Se,Sp) ),
+    c( Pii(0,0,1,0,Se,Sp)-Pii(1,1,1,0,Se,Sp), ghat(1,0)-Pii(1,1,1,0,Se,Sp), Pii(0,1,1,0,Se,Sp)-Pii(1,1,1,0,Se,Sp) ),
+    c( Pii(0,0,0,1,Se,Sp)-Pii(1,1,0,1,Se,Sp), ghat(0,1)-Pii(1,1,0,1,Se,Sp), Pii(0,1,0,1,Se,Sp)-Pii(1,1,0,1,Se,Sp) )
+  )
+  matC <- rbind(
+    c( Pii(0,0,0,0,Se,Sp)-Pii(1,1,0,0,Se,Sp), Pii(1,0,0,0,Se,Sp)-Pii(1,1,0,0,Se,Sp), ghat(0,0)-Pii(1,1,0,0,Se,Sp) ),
+    c( Pii(0,0,1,0,Se,Sp)-Pii(1,1,1,0,Se,Sp), Pii(1,0,1,0,Se,Sp)-Pii(1,1,1,0,Se,Sp), ghat(1,0)-Pii(1,1,1,0,Se,Sp) ),
+    c( Pii(0,0,0,1,Se,Sp)-Pii(1,1,0,1,Se,Sp), Pii(1,0,0,1,Se,Sp)-Pii(1,1,0,1,Se,Sp), ghat(0,1)-Pii(1,1,0,1,Se,Sp) )
+  )
+  A <- det( matA )
+  B <- det( matB )
+  C <- det( matC )
+  D <- det( matD )
+  p00h <- (A/D)^(1/k)
+  p10h <- ((A+B)/D)^(1/k) - (A/D)^(1/k)
+  p01h <- ((A+C)/D)^(1/k) - (A/D)^(1/k)
+  p11h <- 1 - p00h - p10h - p01h
+  phat <- c(p00h, p10h, p01h, p11h)
+
+  JJ <- 2
+  p1 <- phat
+  toss <- tosscoin(JJ)
+  dis.prob <- p1%*%toss
+  tss <- abs(toss-1)[-2^JJ, ]
+  tf.mat <- (tss == 1)
+  cov3 <- SE <- NULL
+  if( covariance ){
+    g <- function(a, b){
+      Pii(0,0,a,b,Se,Sp)*q00 + Pii(1,0,a,b,Se,Sp)*q10 + Pii(0,1,a,b,Se,Sp)*q01 + Pii(1,1,a,b,Se,Sp)*q11 
+    }
+    p00 <- phat[1]
+    p10 <- phat[2]
+    p01 <- phat[3]
+    p11 <- phat[4]
+    q00 <- p00^k
+    q10 <- (p00 + p10)^k - p00^k
+    q01 <- (p00 + p01)^k - p00^k
+    q11 <- 1 + p00^k - (p00 + p10)^k - (p00 + p01)^k
+    g00 <- g(0,0)
+    g10 <- g(1,0)
+    g01 <- g(0,1)
+    g11 <- g(1,1)
+    Ig <- rbind(
+      c( (g00+g11)/(g00*g11), 1/g11, 1/g11 ),
+      c( 1/g11, (g10+g11)/(g10*g11), 1/g11 ),
+      c( 1/g11, 1/g11, (g01+g11)/(g01*g11) )
+    )
+    Ig <- Ig*m
+    dgdq <- rbind(
+      c( Pii(0,0,0,0,Se,Sp)-Pii(1,1,0,0,Se,Sp), Pii(1,0,0,0,Se,Sp)-Pii(1,1,0,0,Se,Sp), Pii(0,1,0,0,Se,Sp)-Pii(1,1,0,0,Se,Sp) ),
+      c( Pii(0,0,1,0,Se,Sp)-Pii(1,1,1,0,Se,Sp), Pii(1,0,1,0,Se,Sp)-Pii(1,1,1,0,Se,Sp), Pii(0,1,1,0,Se,Sp)-Pii(1,1,1,0,Se,Sp) ),
+      c( Pii(0,0,0,1,Se,Sp)-Pii(1,1,0,1,Se,Sp), Pii(1,0,0,1,Se,Sp)-Pii(1,1,0,1,Se,Sp), Pii(0,1,0,1,Se,Sp)-Pii(1,1,0,1,Se,Sp) )
+    )
+    dqdp <- rbind(
+      c(1, 0, 0),
+      c( (1+p10/p00)^(k-1) -1, (1+p10/p00)^(k-1), 0 ),
+      c( (1+p01/p00)^(k-1) -1, 0, (1+p01/p00)^(k-1) )
+    )
+    dqdp <- dqdp*k*p00^(k-1)
+    Info <- t( dgdq%*%dqdp )%*%Ig%*%( dgdq%*%dqdp )
+    cov3 <- solve( Info )
+    Id <- matrix(c(-1,-1,-1),nrow=1,ncol=3)
+    SE <- sqrt(c(diag(cov3),Id%*%cov3%*%t(Id)))
+    se.d <- rep(-9,JJ)
+    for(j in 1:JJ){
+	  col.id <- c(1:(2^JJ-1))[tf.mat[ ,j]]
+	  se.d[j] <- sqrt(sum(cov3[col.id, ]%*%matrix(tss[ ,j],ncol=1)))
+    }
+    out2 <- rbind(dis.prob,se.d)
+    colnames(out2) <- paste( "Disease.", 1:JJ, sep="" )
+    rownames(out2) <- c("Estimate", "Std.Error")
+  }
+  return( list("param"= phat,"covariance"=cov3, "std.err"=SE,"summary"=out2) )
+}

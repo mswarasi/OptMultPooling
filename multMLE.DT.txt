@@ -1,0 +1,129 @@
+
+#*********************************************************#
+# Description
+# -----------
+# Main function to calculate the maximum likelihood 
+# estimate of the multinomial disease prevalence  
+# parameter: p=(p00,p10,p01,p11) from two-stage    
+# hierarchical pooled testing. The estimation is 
+# performed based on the method (EM algorithm) 
+# in Tebbs et al. (2013).
+# 
+# This program uses two FORTRAN subroutines through the 
+# dynamic link library files "gbbstwodisgen.dll" and 
+# "covtwodisgen.dll". This function works with a 64-bit 
+# R compiler.
+#
+#
+# Usage
+# -----
+# mult.mle.dt(p0=rep(.25,4),Ytmat,Zmat,G=500,a=100,tol=10^(-3),covariance=FALSE)
+#
+#
+# Arguments
+# ---------
+# p0     : Starting value of the parameter p.
+#
+# Ytmat  : N by (3+max.asgn) matrix, where max.asgn is the maximum number 
+#          of pools individuals are assigned to. Columns of this matrix:
+# Col 1  : Individual true statuses for disease 1.
+# Col 2  : Individual true statuses for disease 2.
+# Col 3  : Number of pools an individual assigned to.
+# Col 4-max.asgn: ID of the pools each individual is assigned to.
+# Note: Missing elements of columns 4-max.asgn must be completed by -9.
+#
+# Zmat   : T by (7+max.psz) matrix, where T is the number of test   
+#          expended and max.psz is the maximum pool size used in 
+#          testing. Columns of the matrix:
+# Col 1  : Test responses for disease 1
+# Col 2  : Test responses for disease 2
+# Col 3  : Each pool size
+# Col 4  : Pool-specific sensitivity for disease 1.
+# Col 5  : Pool-specific sensitivity for disease 2.
+# Col 6  : Pool-specific specificity for disease 1.
+# Col 7  : Pool-specific specificity for disease 2.
+# Col 8-max.psz: ID of the individuals assigned to each pool.
+# Note: Missing elements of columns 8-max.psz must be completed by -9.
+#
+# G      : Number of Gibbs iterates after the burn-in period.
+# a      : Burn-in period; i.e., the number of initial Gibbs iterates 
+#          to be discarded. Recall that the Gibbs sampling is used in
+#          the E-step.
+# tol    : Convergence tolerance of the EM algorithm.
+# covariance : If TRUE, covariance matrix for (p00,p10,p01) is estimated.
+#
+#
+# Value
+# -----
+# A list of estimates with components:
+#
+# param      : Maximum likelihood estimate of p=(p00,p10,p01,p11)
+# covariance : Estimated covariance matrix of (p00,p10,p01)
+# std.err    : Standard error of the estimates
+# summary    : Summary of the marginal disease prevalence
+#
+#
+mult.mle.dt <- function(p0=rep(.25,4),Ytmat,Zmat,G=500,a=100,tol=10^(-3),covariance=FALSE){
+  tosscoin <- function(times){
+    temp <- list()
+    for (i in 1:times){
+        temp[[i]] <- c(0,1)
+    }
+    res <- expand.grid(temp, KEEP.OUT.ATTRS = FALSE)
+    return(as.matrix(res))
+  }
+  dyn.load("gbbstwodisgen.dll")
+  N <- nrow(Ytmat)
+  Ycol <- ncol(Ytmat)
+  SeSp <- Zmat[ ,4:7]
+  Zmat <- Zmat[ ,-(4:7)]
+  Zrow <- nrow(Zmat)
+  Zcol <- ncol(Zmat)
+  p1 <- p0
+  p0 <- p0 + 2*tol
+  s <- 1
+  while(max(abs(p1-p0)) > tol){
+    p0 <- p1
+    V <- matrix(0,nrow=N,ncol=4)
+    U <- matrix(runif(N*G),nrow=N,ncol=G)
+    res <- .C("gbbstwodisgen",as.integer(V),p0,as.integer(Ytmat),
+              as.integer(Zmat),as.integer(N),SeSp,as.integer(Ycol),
+              as.integer(Zrow),as.integer(Zcol),U,as.integer(G),
+              as.integer(a))
+    p1 <- colMeans( matrix(res[[1]],N,4)/(G-a) )
+
+    s <- s + 1
+    print(c(s,p1))
+  }
+  dyn.unload("gbbstwodisgen.dll")
+  se <- cov3 <- out2 <- NULL
+  if(covariance){
+    dyn.load("covtwodisgen.dll")
+    Qmat <- Cov <- matrix(-9,3,3)
+    V <- matrix(0,nrow=N,ncol=4)
+    U <- matrix(runif(N*G),nrow=N,ncol=G)
+    res2 <- .C("covtwodisgen",Qmat,Cov,as.integer(V),p1,as.integer(Ytmat),
+             as.integer(Zmat),as.integer(N),SeSp,as.integer(Ycol),
+             as.integer(Zrow),as.integer(Zcol),U,as.integer(G),
+             as.integer(a))
+    dyn.unload("covtwodisgen.dll")
+	Info <- - matrix(res2[[1]],3,3)-matrix(res2[[2]],3,3)
+    cov3 <- solve( Info )
+    Id <- matrix(c(-1,-1,-1),nrow=1,ncol=3)
+    se <- sqrt(c(diag(cov3),Id%*%cov3%*%t(Id)))
+    JJ <- 2
+    toss <- tosscoin(JJ)
+	dis.prob <- p1%*%toss
+	tss <- abs(toss-1)[-2^JJ, ]
+	tf.mat <- (tss == 1)
+	se.d <- rep(-9,JJ)
+	for(j in 1:JJ){
+	  col.id <- c(1:(2^JJ-1))[tf.mat[ ,j]]
+	  se.d[j] <- sqrt(sum(cov3[col.id, ]%*%matrix(tss[ ,j],ncol=1)))
+	}
+    out2 <- rbind(dis.prob,se.d)
+    colnames(out2) <- paste( "Disease.", 1:JJ, sep="" )
+    rownames(out2) <- c("Estimate", "Std.Error")
+  }
+  return( list("param"=p1,"covariance"=cov3,"std.err"=se,"summary"=out2) )
+}
