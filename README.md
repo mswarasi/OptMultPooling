@@ -41,10 +41,11 @@ setwd(dir = "C:\\programs")
 
 ## Import the files
 source( "multMLE.MPT.txt" )
+
 source( "multMLE.DT.txt" )
+
 source( "InitialPooledTesting.txt" )
+
 source( "TwoStageHierPooling.txt" )
 
-
-###################### SIMULATION EXAMPLES ######################
 
