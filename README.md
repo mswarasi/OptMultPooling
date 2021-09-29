@@ -19,6 +19,8 @@ Files uploaded:
 
 6). gbbstwodisgen.dll -- Used in function **mult.mle.dt**
 
+7). SimulationExamples.R -- Provides simulation examples
+
 We briefly illustrate how functions **mult.mle.mpt** and **mult.mle.dt** can be used to calculate the maximum likelihood estimates of p=(p00,p10,p01,p11).
 
 
@@ -36,16 +38,45 @@ mult.mle.mpt(multData,psz,Se,Sp,covariance=FALSE)
 mult.mle.dt(p0=rep(.25,4),Ytmat,Zmat,G=500,a=100,tol=10^(-3),covariance=FALSE)
 
 
-## Download and save the files in a computer folder and specify the directory:
-setwd(dir = "C:\\programs")
+###################### SIMULATION EXAMPLES ######################
 
-## Import the files
-source( "multMLE.MPT.txt" )
+# Simulation configurations:
+psz <- 5           # Pool size
+N <- 1000          # Sample size
+Se <- c(.95, .99)  # Sensitivities for diseases 1 & 2       
+Sp <- c(.95, .99)  # Specificities for diseases 1 & 2 
 
-source( "multMLE.DT.txt" )
-
-source( "InitialPooledTesting.txt" )
-
-source( "TwoStageHierPooling.txt" )
+# True parameter to be estimated (co-infection probabilites)
+p <- c(0.85, 0.07, 0.05, 0.03)
 
 
+# Initial Pooled Testing 
+
+# Simulating data:
+set.seed(123)
+mpt <- gt.mpt(p=p,N=N,psz=psz,Se=Se,Sp=Sp)
+M <- colSums( mpt$Zmul )
+
+## Estimation based on the work in Li et al. (2017):
+res1 <- mult.mle.mpt(multData=M,psz=psz,Se=Se,Sp=Sp,covariance=TRUE)
+
+print( res1 )
+
+# Estimation results:
+
+$param
+[1] 0.84932645 0.08155183 0.05521984 0.01390187
+
+$covariance
+              [,1]          [,2]          [,3]
+[1,]  2.175047e-04 -1.462123e-04 -9.388685e-05
+[2,] -1.462123e-04  1.532123e-04  3.002627e-05
+[3,] -9.388685e-05  3.002627e-05  1.030300e-04
+
+$std.err
+[1] 0.014748040 0.012377897 0.010150372 0.007321286
+
+$summary
+          Disease.1   Disease.2
+Estimate 0.09545371 0.069121716
+Std.Err  0.01152220 0.008848296
