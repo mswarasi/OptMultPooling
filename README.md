@@ -1,8 +1,8 @@
 # OptMultPooling
 
-This repository contains R programs of the working paper, "Optimizing pooled testing for determining prevalence and/or identifying infected." Our goal is to examine the optimal pooling strategies with multiple (correlated) infections. Particularly, we intend to determine the pool size that (a) maximizes the estimation efficiency (precision), (b) maximizes the testing efficiency, or (c) offers the best cost-effective estimation as a compromise between optimal estimation and optimal testing. Another goal is to develop user-friendly R programs that practitioners can easily use.
+This repository contains R programs of the working paper, "Optimizing pooled testing for determining prevalence and/or identifying infected." Our goal is to examine the optimal pooling strategies with multiple (correlated) infections. Particularly, we intend to determine the pool size that (a) maximizes the estimation efficiency (precision), (b) maximizes the testing efficiency, or (c) offers the best cost-effective estimation as a compromise between optimal estimation and optimal testing. Another goal is to develop user-friendly R programs that practitioners can easily use for surveillance applications with pooled testing data.
 
-We consider two types of pooling data: initial pooled test and two-stage hierarchical testing. Under both pooling protocols, we use a duplex discriminatory assay that provides diagnostic outcomes for two infections such as chlamydia and gonorrhea. Our approach involves calculating the maximum likelihood estimates of the multinomial disease prevalence parameter p=(p00, p10, p01, p11) based on the methods in Tebbs et al. (2013) and Li et al. (2017).
+We consider two types of pooling protocols: master pooled testing (i.e., when only initial pools are tested) and two-stage hierarchical testing (i.e., the Dorfman-type pooling as in Tebbs et al. (2013)). Under both protocols, we use a duplex discriminatory assay that provides diagnostic outcomes for two infections such as chlamydia and gonorrhea from each single test. Our approach involves calculating the maximum likelihood estimate (MLE) of the multinomial disease prevalence parameter p=(p00, p10, p01, p11) based on the methods in Tebbs et al. (2013) and Li et al. (2017).
 
 
 Files uploaded:
@@ -21,7 +21,7 @@ Files uploaded:
 
 7). SimulationExamples.R -- Provides simulation examples
 
-We briefly illustrate how functions **mult.mle.mpt** and **mult.mle.dt** can be used to calculate the maximum likelihood estimates of p=(p00,p10,p01,p11).
+We briefly illustrate how functions **mult.mle.mpt** and **mult.mle.dt** can be used to calculate the maximum likelihood estimate of p=(p00,p10,p01,p11).
 
 
 References
