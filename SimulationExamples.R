@@ -2,7 +2,7 @@
 #######################################################
 
 ## Specify the working directory:
-setwd("C:/Users/msarker/Desktop/Optimality_Hungerford/Code4GitHub_092921")
+setwd("C:/ ... ")
 
 ## Import the R functions:
 source( "multMLE.MPT.txt" )
