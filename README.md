@@ -7,17 +7,17 @@ We consider two types of pooling protocols: master pooled testing (i.e., when on
 
 Files uploaded:
 
-1). multMLE.MPT.txt -- Provides the main funciton **mult.mle.dt** for maximum likelihood estimation from initial pooled responses (Li et al., 2017)
+1). multMLE.MPT.txt -- Provides the main funciton **mult.mle.mpt** for maximum likelihood estimation from initial pooled responses (Li et al., 2017)
 
-2). multMLE.DT.txt -- Provides the main funciton **mult.mle.mpt** for maximum likelihood estimation from two-stage hierarchical pooled responses (Tebbs et al., 2013)
+2). multMLE.DT.txt -- Provides the main funciton **mult.mle.dt** for maximum likelihood estimation from two-stage hierarchical testing data (Tebbs et al., 2013)
 
 3). InitialPooledTesting.txt -- Provides a function to simulate initial pooled responses
 
 4). TwoStageHierPooling.txt -- Provides a function to simulate two-stage hierarchical pooling data
 
-5). covtwodisgen.dll -- Used in function **mult.mle.dt**
+5). covtwodisgen.dll -- Compiled FORTRAN subroutines used in function **mult.mle.dt**
 
-6). gbbstwodisgen.dll -- Used in function **mult.mle.dt**
+6). gbbstwodisgen.dll -- Compiled FORTRAN subroutines used in function **mult.mle.dt**
 
 7). SimulationExamples.R -- Provides simulation examples
 
