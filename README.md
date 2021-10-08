@@ -50,7 +50,7 @@ Sp <- c(.95, .99)  # Specificities for diseases 1 & 2
 p <- c(0.85, 0.07, 0.05, 0.03)  # True parameter
 
 
-## Simulation and estimation based on the work in Li et al. (2017):
+## Estimation based on the work in Li et al. (2017):
 
 set.seed(123)
 
@@ -94,7 +94,7 @@ Std.Err  0.01152220 0.008848296
 
 
 
-## Simulation and estimation based on the work in Tebbs et al. (2013):
+## Estimation based on the work in Tebbs et al. (2013):
 
 set.seed(123)
 
