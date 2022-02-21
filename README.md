@@ -1,8 +1,8 @@
 # OptimalMultiplexGT
 
-This repository contains R programs of the working paper, "Optimizing pooled testing for determining prevalence and/or identifying infected." Our goal is to examine the optimal pooling strategies with multiple (correlated) infections. Particularly, we intend to determine the pool size that (a) maximizes the estimation efficiency (precision), (b) maximizes the testing efficiency, or (c) offers the best cost-effective estimation as a compromise between optimal estimation and optimal testing. Another goal is to develop user-friendly R programs that practitioners can easily use in surveillance applications with pooled testing data.
+This repository contains R and Fortran programs of the working paper, "Optimizing pooled testing for estimating the prevalence of multiple diseases." The aim of this work is to develop statistical methods that provide most precise estimates for the marginal or coinfection prevalence of multiple infections from pooled testing data. Particularly, we determine the pool size that optimizes (a) estimation efficiency (precision), (b) testing efficiency, or (c) cost-effective efficiency (i.e., a compromise between optimal estimation and optimal testing). Another goal is to develop a user-friendly software package that practitioners can easily use in surveillance applications with pooled testing data.
 
-We consider two types of pooling protocols: master pooled testing (i.e., when only initial pools are tested) and two-stage hierarchical testing (i.e., the Dorfman-type pooling as in Tebbs et al. (2013)). Under both protocols, we use a duplex discriminatory assay that provides diagnostic outcomes for two infections such as chlamydia and gonorrhea from each single test. Our approach involves calculating the maximum likelihood estimate (MLE) of the multinomial disease prevalence parameter p=(p00, p10, p01, p11) based on the methods in Tebbs et al. (2013) and Li et al. (2017).
+We consider two types of pooling protocols: pooled testing only and two-stage hierarchical testing. Under both protocols, we use a duplex discriminatory assay that provides diagnostic outcomes for two infections such as chlamydia and gonorrhea from each single test. We use the maximum likelihood framework, where the optimization methods are developed based on the Fisher information matrix for the vector of coinfection probabilities: (p00, p10, p01), where p11 = 1 - p00 - p10 - p01.
 
 
 Files uploaded:
@@ -25,10 +25,7 @@ We briefly illustrate how functions **mult.mle.mpt** and **mult.mle.dt** can be 
 
 
 References
-1. Hungerford, L., Warasi, M., and Lahmers, K. (2021+). Optimizing pooled testing for determining prevalence and/or identifying infected. In preparation.
-2. Tebbs, J., McMahan, C., and Bilder, C. (2013). Two-stage hierarchical group testing for multiple infections with application to the Infertility Prevention Project. _Biometrics_, **69**, 1064-1073.
-3. Li, Q., Liu, A., and Xiong, W. (2017). D-optimality of group testing for joint estimation of correlated rare diseases with misclassification. _Statistica Sinica_, **27**, 823-838.
-
+1. Hungerford, L., Warasi, M., and Lahmers, K. (2022+). Optimizing pooled testing for estimating the prevalence of multiple diseases. *Under review*.
 
 
 # Usage
